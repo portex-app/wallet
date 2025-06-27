@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portex ETH 钱包 IIFE 测试</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .section {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fafafa;
+      }
+
+      .button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 5px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .status {
+        padding: 10px;
+        border-radius: 6px;
+        margin: 10px 0;
+        font-weight: bold;
+      }
+
+      .status.connected {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status.disconnected {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 15px 0;
+      }
+
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 15px 0;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin: 5px 0;
+        box-sizing: border-box;
+      }
+
+      label {
+        display: block;
+        margin-top: 10px;
+        font-weight: bold;
+        color: #555;
+      }
+
+      .code-block {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 15px;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        overflow-x: auto;
+        margin: 10px 0;
+      }
+
+      .wallet-info {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #e8f4fd;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🚀 Portex ETH 钱包 IIFE 测试页面</h1>
+
+      <div class="info">
+        <strong>说明：</strong> 这个页面演示了如何在HTML中使用Portex ETH钱包SDK的IIFE版本。请确保你已经构建了项目并且dist文件存在。
+      </div>
+
+      <div class="section">
+        <h3>📊 钱包状态</h3>
+        <div id="walletStatus" class="status disconnected">未连接</div>
+        <div id="walletInfo" class="wallet-info"></div>
+      </div>
+
+      <div class="section">
+        <h3>🔌 钱包连接</h3>
+        <button class="button" id="connectBtn">连接钱包</button>
+        <button class="button" id="disconnectBtn" disabled>断开连接</button>
+        <button class="button" id="getAccountBtn">获取账户信息</button>
+      </div>
+
+      <div class="section">
+        <h3>💸 发送交易</h3>
+        <label for="toAddress">接收地址:</label>
+        <input type="text" id="toAddress" placeholder="0x..." />
+
+        <label for="amount">金额 (ETH):</label>
+        <input type="text" id="amount" placeholder="0.01" value="0.01" />
+
+        <button class="button" id="sendBtn" disabled>发送交易</button>
+      </div>
+
+      <div class="section">
+        <h3>📋 日志</h3>
+        <div id="logs" class="code-block"></div>
+        <button class="button" id="clearLogsBtn">清空日志</button>
+      </div>
+    </div>
+
+    <!-- 引入 IIFE 格式的库 -->
+    <script src="../dist/index.iife.js"></script>
+    <script>
+      let wallet = null;
+
+      function log(message, type = 'info') {
+        const logs = document.getElementById('logs');
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = `[${timestamp}] ${message}\n`;
+        logs.textContent += logEntry;
+        logs.scrollTop = logs.scrollHeight;
+
+        console.log(message);
+
+        // 显示错误信息
+        if (type === 'error') {
+          showError(message);
+        }
+      }
+
+      function showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error';
+        errorDiv.textContent = message;
+        document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.section'));
+        setTimeout(() => errorDiv.remove(), 5000);
+      }
+
+      function updateWalletStatus(connected) {
+        const status = document.getElementById('walletStatus');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const sendBtn = document.getElementById('sendBtn');
+
+        if (connected) {
+          status.textContent = '已连接';
+          status.className = 'status connected';
+          connectBtn.disabled = true;
+          disconnectBtn.disabled = false;
+          sendBtn.disabled = false;
+        } else {
+          status.textContent = '未连接';
+          status.className = 'status disconnected';
+          connectBtn.disabled = false;
+          disconnectBtn.disabled = true;
+          sendBtn.disabled = true;
+        }
+      }
+
+      function updateWalletInfo(account) {
+        const info = document.getElementById('walletInfo');
+        if (account) {
+          info.textContent = `地址: ${account.address}`;
+        } else {
+          info.textContent = '';
+        }
+      }
+
+      async function initWallet() {
+        try {
+          wallet = PortexETH.Wallet.getInstance();
+          log('钱包初始化成功');
+          // 添加状态变化监听
+          wallet.addStatusChangeListener((status, account) => {
+            updateWalletStatus(status === 'connected');
+            updateWalletInfo(account);
+            log(`钱包状态变化: ${status}`);
+          });
+
+          // 检查初始状态
+          if (wallet.connected) {
+            updateWalletStatus(true);
+            updateWalletInfo(wallet.account);
+          }
+        } catch (error) {
+          log(`钱包初始化失败: ${error.message}`, 'error');
+        }
+      }
+
+      // 事件监听
+      document.getElementById('connectBtn').addEventListener('click', async () => {
+        try {
+          await wallet.connect();
+          log('钱包连接成功');
+        } catch (error) {
+          log(`连接失败: ${error.message}`, 'error');
+        }
+      });
+
+      document.getElementById('disconnectBtn').addEventListener('click', async () => {
+        try {
+          await wallet.disconnect();
+          log('钱包已断开连接');
+        } catch (error) {
+          log(`断开连接失败: ${error.message}`, 'error');
+        }
+      });
+
+      document.getElementById('getAccountBtn').addEventListener('click', () => {
+        if (wallet.account) {
+          log(`当前账户: ${wallet.account.address}`);
+        } else {
+          log('未连接钱包', 'error');
+        }
+      });
+
+      document.getElementById('sendBtn').addEventListener('click', async () => {
+        const toAddress = document.getElementById('toAddress').value;
+        const amount = document.getElementById('amount').value;
+
+        if (!toAddress || !amount) {
+          log('请填写接收地址和金额', 'error');
+          return;
+        }
+        console.log('amount', amount);
+        try {
+          const txHash = await wallet.sendTransaction(toAddress, amount);
+          log(`交易已发送，哈希: ${txHash}`);
+        } catch (error) {
+          log(`发送交易失败: ${error.message}`, 'error');
+        }
+      });
+
+      document.getElementById('clearLogsBtn').addEventListener('click', () => {
+        document.getElementById('logs').textContent = '';
+      });
+
+      // 启动应用
+      document.addEventListener('DOMContentLoaded', () => {
+        log('页面加载完成，开始初始化...');
+        initWallet();
+      });
+
+      // 调试信息
+      log('HTML页面脚本已加载');
+      log(`当前时间: ${new Date().toLocaleString()}`);
+    </script>
+  </body>
+</html>

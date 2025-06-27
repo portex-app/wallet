@@ -1,0 +1,32 @@
+{
+  "name": "@portex/wallet-eth",
+  "version": "1.0.0",
+  "description": "Ethereum Wallet SDK for Portex",
+  "type": "module",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.umd.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c && mkdir -p ../../dist/eth && cp -r dist/* ../../dist/eth/",
+    "dev": "rollup -c -w",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "ethereum",
+    "web3"
+  ],
+  "peerDependencies": {
+    "web3": "^4.16.0"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  // �� 应用代码 TypeScript 配置文件
+  // 用于 packages 下各个 SDK 包的源代码
+  "compilerOptions": {
+    // 🔧 构建信息文件路径
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+
+    // 🎯 编译目标版本
+    "target": "ES2020", // 编译为 ES2020 标准，支持现代浏览器
+
+    // 🏗️ 类字段定义方式
+    "useDefineForClassFields": true, // 使用 Object.defineProperty 定义类字段
+
+    // 📚 包含的库文件
+    "lib": ["ES2020", "DOM", "DOM.Iterable"], // 包含 ES2020、DOM API 和 DOM 迭代器
+
+    // 📦 模块系统
+    "module": "ESNext", // 使用最新的 ES 模块语法
+
+    // ⚡ 跳过库文件类型检查，提高编译速度
+    "skipLibCheck": true,
+
+    /* 📦 Bundler 模式配置 */
+    "moduleResolution": "bundler", // 使用打包工具的模块解析策略
+    "allowImportingTsExtensions": false, // SDK库不允许导入 .ts 扩展名
+    "verbatimModuleSyntax": true, // 保持模块语法的原始形式
+    "moduleDetection": "force", // 强制检测模块
+    "noEmit": true, // 不输出编译文件，由 rollup 处理
+    "isolatedModules": true, // 确保每个文件都是独立的模块
+
+    /* 🔧 高级配置 */
+    "incremental": true, // 启用增量编译
+    "composite": true, // 启用项目引用
+    "resolvePackageJsonExports": true, // 解析 package.json 的 exports 字段
+    "resolvePackageJsonImports": true, // 解析 package.json 的 imports 字段
+    "resolveJsonModule": true, // 允许导入 JSON 模块
+
+    /* 🔍 严格类型检查配置 */
+    "strict": true, // 启用所有严格类型检查
+    "noImplicitAny": true, // 不允许隐式 any 类型
+    "strictNullChecks": true, // 严格空值检查
+    "strictFunctionTypes": true, // 严格函数类型检查
+    "strictBindCallApply": true, // 严格的 bind/call/apply 检查
+    "strictPropertyInitialization": true, // 严格属性初始化检查
+    "noImplicitThis": true, // 不允许隐式 this
+    "alwaysStrict": true, // 始终以严格模式解析
+    "noUnusedLocals": true, // 检查未使用的局部变量
+    "noUnusedParameters": true, // 检查未使用的函数参数
+    "noImplicitReturns": true, // 检查函数的所有路径都有返回值
+    "noFallthroughCasesInSwitch": true, // 检查 switch 语句的 fallthrough
+    "noUncheckedIndexedAccess": true, // 检查索引访问的安全性
+    "noImplicitOverride": true, // 要求显式使用 override 关键字
+    "noUncheckedSideEffectImports": true, // 检查导入的副作用
+
+    /* 🌐 互操作性配置 */
+    "allowSyntheticDefaultImports": true, // 允许合成默认导入
+    "esModuleInterop": true, // 启用 ES 模块互操作
+    "forceConsistentCasingInFileNames": true, // 强制文件名大小写一致
+
+    /* 🎨 代码生成配置 */
+    "preserveConstEnums": true, // 保留 const 枚举
+    "declaration": true, // 生成声明文件
+    "declarationMap": true, // 生成声明文件映射
+
+    /* 🗂️ 路径配置 */
+    "baseUrl": ".", // 基础路径为项目根目录
+    "paths": {
+      "@portex/wallet-eth": ["packages/eth/src"],
+      "@portex/wallet-ton": ["packages/ton/src"],
+      "@portex/wallet-eth/*": ["packages/eth/src/*"],
+      "@portex/wallet-ton/*": ["packages/ton/src/*"]
+    }
+  },
+
+  // 📁 包含的文件
+  "include": [
+    "packages/*/src/**/*" // 包含所有包的源代码
+  ],
+
+  // 🚫 排除的文件
+  "exclude": [
+    "node_modules",
+    "packages/*/dist",
+    "packages/*/node_modules",
+    "**/*.config.*",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "dist/**"
+  ]
+}

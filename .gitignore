@@ -7,10 +7,12 @@ package-lock.json
 yarn.lock
 
 # Build output
-dist/
 build/
 lib/
+packages/*/dist/
 *.tsbuildinfo
+.rollup.cache/
+.turbo/
 
 # IDE and editor files
 .idea/
@@ -21,6 +23,7 @@ lib/
 .env
 .env.local
 .env.*.local
+
 
 # Testing
 coverage/
