@@ -1,79 +1,36 @@
-import typescript from '@rollup/plugin-typescript';
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import terser from '@rollup/plugin-terser';
-import replace from '@rollup/plugin-replace';
-import json from '@rollup/plugin-json';
-import url from '@rollup/plugin-url';
-import inject from '@rollup/plugin-inject';
-import nodePolyfills from 'rollup-plugin-node-polyfills';
+import { createRollupConfig } from '../../rollup.config.shared.js';
 
-export default {
-  input: 'src/index.ts',
-  output: [
-    {
-      file: 'dist/index.mjs',
-      format: 'esm',
-      sourcemap: true
-    },
-    {
-      file: 'dist/index.umd.js',
-      format: 'umd',
-      name: 'PortexTON',
-      sourcemap: true,
-      exports: 'named'
-    },
-    {
-      file: 'dist/index.iife.js',
-      format: 'iife',
-      name: 'PortexTON',
-      sourcemap: true,
-      exports: 'named'
-    }
-  ],
-
-  plugins: [
-    replace({
-      preventAssignment: true,
-      delimiters: ['\\b', '\\b'],
-      global: 'globalThis',
-      'process.env.NODE_DEBUG': false,
-      'process.env.NODE_ENV': JSON.stringify('production'),
-      'process.platform': JSON.stringify('browser'),
-      'process.version': JSON.stringify('v16.0.0'),
-      'process.browser': true
-    }),
-    typescript({
-      sourceMap: true,
-      declaration: true,
-      declarationDir: './dist',
-      outputToFilesystem: true
-    }),
-    resolve({
-      browser: true,
-      preferBuiltins: false,
-      mainFields: ['browser', 'module', 'main']
-    }),
-    commonjs({
-      include: /node_modules/,
-      transformMixedEsModules: true
-    }),
-    json(),
-    url(),
-    terser({
+// TON 包只构建 ESM 和 UMD 格式，自定义插件配置
+export default createRollupConfig({
+  name: 'PortexTON',
+  outputOptions: {
+    formats: ['esm', 'umd'] // 不包含 iife
+  },
+  pluginOptions: {
+    terser: {
       compress: {
-        drop_console: false,
+        drop_console: true, // 生产环境移除 console 日志
         drop_debugger: true
       }
-    }),
-    inject({
-      Buffer: ['buffer', 'Buffer']
-    }),
-    nodePolyfills()
-  ],
-  treeshake: {
-    moduleSideEffects: false,
-    propertyReadSideEffects: false,
-    unknownGlobalSideEffects: false
+    },
+    enable: {
+      url: false // TON 包不需要处理 URL 资源
+    }
   }
-};
+});
+
+// 如果需要特殊的环境变量配置：
+// export default createRollupConfig({
+//   name: 'PortexTON',
+//   outputOptions: {
+//     formats: ['esm', 'umd']
+//   },
+//   pluginOptions: {
+//     replace: {
+//       'process.env.TON_NETWORK': JSON.stringify('mainnet')
+//     },
+//     enable: {
+//       nodePolyfills: true // TON 包可能需要 crypto 等 Node.js 模块
+//     }
+//   }
+// });
