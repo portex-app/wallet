@@ -17,8 +17,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c && mkdir -p ../../dist/ton && cp -r dist/* ../../dist/ton/",
-    "dev": "rollup -c -w",
+    "build": "tsdown && mkdir -p ../../dist/ton && cp -r dist/* ../../dist/ton/",
+    "dev": "tsdown -w",
     "type-check": "tsc --noEmit",
     "clean": "rimraf dist"
   },
@@ -26,10 +26,11 @@
     "ton",
     "tonconnect"
   ],
-  "peerDependencies": {
+  "devDependencies": {
     "@ton/core": "^0.53.0",
     "@tonconnect/ui": "^2.1.0",
     "buffer": "^6.0.3",
-    "tonweb": "^0.0.66"
+    "tonweb": "^0.0.66",
+    "tsdown": "^0.12.9"
   }
 }
