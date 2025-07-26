@@ -256,8 +256,15 @@
           throw new Error('manifest配置文件不能为空');
         }
         wallet = PortexTON.Wallet.getInstance(manifestUrl);
-        wallet.addStatusChangeListener((status, account) => {
-          updateWalletStatus(status, account);
+        wallet.onStatusChange(function(status, account) {
+          if (status === 'connected' && account) {
+            updateWalletStatus('connected', account);
+            log('已连接，原始地址: ' + account.address);
+            log('人类可读地址: ' + (account.addressUserFriendly || '无法解析'));
+          } else {
+            updateWalletStatus('disconnected', null);
+            log('未连接');
+          }
         });
         log('钱包初始化完成');
       }
@@ -274,7 +281,7 @@
         statusEl.className = `status ${status}`;
 
         if (account) {
-          infoEl.textContent = `钱包地址: ${account.address}`;
+          infoEl.textContent =  `钱包地址: ${account.addressUserFriendly}`;
           connectBtn.disabled = true;
           disconnectBtn.disabled = false;
           sendBtn.disabled = false;
@@ -289,14 +296,21 @@
       }
 
       async function connectWallet() {
+        log('开始连接钱包...');
+        if (!wallet) {
+          log('钱包实例未初始化', 'error');
+          return;
+        }
         try {
-          log('连接钱包...');
-          if (!wallet) {
-            throw new Error('钱包实例未初始化');
+          const result = await wallet.connect();
+          if (result) {
+            log('连接成功，钱包地址: ' + (wallet.account ? wallet.account.address : '未知'));
+            log('人类可读地址: ' + (wallet.addressUserFriendly || '无法解析'));
+          } else {
+            log('用户取消连接或未连接成功');
           }
-          await wallet.connect();
         } catch (error) {
-          log(`连接钱包失败: ${error.message}`, 'error');
+          log('连接钱包异常: ' + (error && error.message ? error.message : error), 'error');
         }
       }
 

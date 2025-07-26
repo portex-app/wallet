@@ -1,8 +1,16 @@
-import { TonConnectUI, type TonProofItemReply, type Wallet as TonConnectWallet } from '@tonconnect/ui';
+import { TonConnectUI, type TonProofItemReply, type Wallet as TonConnectWallet, type WalletsModalState } from '@tonconnect/ui';
 import { toNano, beginCell, Address } from '@ton/core';
 import { Buffer } from 'buffer';
-import { TonWalletStatus as WalletStatus, type TonWalletAccount as WalletAccount } from './types';
+import { TonWalletStatus as WalletStatus, type TonWalletAccount as WalletAccountBase } from './types';
 window.Buffer = Buffer;
+
+/**
+ * 扩展 WalletAccount，增加人类可读地址
+ */
+export interface WalletAccount extends WalletAccountBase {
+  /** 人类可读格式地址 */
+  addressUserFriendly?: string;
+}
 
 // TON API 返回的 Jetton 钱包信息类型
 interface TonApiJettonWalletResponse {
@@ -114,6 +122,9 @@ export class Wallet {
   /** Jetton钱包地址缓存 */
   private jettonWalletCache: Map<string, JettonWalletCacheItem> = new Map();
 
+  /** 保存 TonConnect 状态变化的 unsubscribe 函数 */
+  private _tonConnectStatusUnsubscribe?: () => void;
+
   /**
    * 构造函数
    * @param options TON 钱包配置选项
@@ -136,10 +147,11 @@ export class Wallet {
     }
 
     // 监听钱包状态变化
-    this.tonConnectUI.onStatusChange(wallet => {
-      console.log('update');
+    this._tonConnectStatusUnsubscribe = this.tonConnectUI.onStatusChange(wallet => {
       this.handleTonConnectStatusChange(wallet);
     });
+
+
   }
 
   /**
@@ -183,7 +195,15 @@ export class Wallet {
       const account: WalletAccount = {
         address: wallet.account.address,
         publicKey: wallet.account.publicKey || undefined,
-        chainId: wallet.account.chain
+        chainId: wallet.account.chain,
+        addressUserFriendly: (() => {
+          try {
+            // 如果直接用 this.addressUserFriendly，有可能拿到的是旧的、未同步的 Wallet 实例状态，而不是当前事件回调里的最新 account。
+            return Address.parse(wallet.account.address).toString({ testOnly: this.getNetwork() === 'testnet' });
+          } catch {
+            return undefined;
+          }
+        })()
       };
       this.updateStatus(WalletStatus.CONNECTED, account);
     } else {
@@ -242,6 +262,23 @@ export class Wallet {
   }
 
   /**
+   * 获取当前连接的钱包地址（人类可读格式，non-bounceable，与钱包UI一致）
+   * @returns 人类可读格式地址（如 UQ.../KQ...）
+   */
+  get addressUserFriendly(): string | undefined {
+    if (!this.tonConnectUI.account?.address) return undefined;
+    try {
+      return Address.parse(this.tonConnectUI.account.address).toString({
+        testOnly: this.getNetwork() === 'testnet',
+        bounceable: false
+      });
+    } catch {
+      return undefined;
+    }
+  }
+
+
+  /**
    * 更新钱包状态
    * @param status 新状态
    * @param account 账户信息
@@ -285,19 +322,25 @@ export class Wallet {
   }
 
   /**
-   * 添加状态变化监听器
-   * @param handler 监听器函数
+   * 监听 TonConnect 钱包连接状态变化
+   * @param handler 监听器函数，参数为 WalletStatus 和 WalletAccount
+   * @returns 解绑函数
    */
-  addStatusChangeListener(handler: (status: WalletStatus, account?: WalletAccount | null) => void): void {
-    this.statusChangeHandlers.add(handler);
-  }
-
-  /**
-   * 移除状态变化监听器
-   * @param handler 监听器函数
-   */
-  removeStatusChangeListener(handler: (status: WalletStatus, account?: WalletAccount | null) => void): void {
-    this.statusChangeHandlers.delete(handler);
+  onStatusChange(handler: (status: WalletStatus, account?: WalletAccount | null) => void): () => void {
+    // 直接监听 TonConnectUI 状态变化，转换为 WalletStatus 和 WalletAccount
+    return this.tonConnectUI.onStatusChange(wallet => {
+      if (wallet?.account) {
+        const account: WalletAccount = {
+          address: wallet.account.address,
+          publicKey: wallet.account.publicKey || undefined,
+          chainId: wallet.account.chain,
+          addressUserFriendly: this.addressUserFriendly,
+        };
+        handler(WalletStatus.CONNECTED, account);
+      } else {
+        handler(WalletStatus.DISCONNECTED, null);
+      }
+    });
   }
 
   /**
@@ -308,6 +351,12 @@ export class Wallet {
       this.tonConnectUI.disconnect();
     }
     this.tonConnectUI.closeModal();
+
+    // 解绑 onStatusChange
+    if (this._tonConnectStatusUnsubscribe) {
+      this._tonConnectStatusUnsubscribe();
+      this._tonConnectStatusUnsubscribe = undefined;
+    }
 
     // 清空单例实例
     if (Wallet.instance === this) {
@@ -322,9 +371,38 @@ export class Wallet {
 
   /**
    * 连接钱包
+   * @returns 连接是否成功
    */
-  async connect(): Promise<void> {
-    await this.tonConnectUI.openModal();
+  async connect(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let resolved = false;
+      // 监听模态框关闭，onModalStateChange 返回 unsubscribe 函数
+      const unsubscribe = this.tonConnectUI.onModalStateChange((state: WalletsModalState) => {
+        if (state.status === 'closed') {
+          if (!resolved) {
+            resolved = true;
+            unsubscribe(); // 解绑监听
+            resolve(this.connected);
+          }
+        }
+      });
+      // 打开模态框
+      try {
+        this.tonConnectUI.openModal().catch((err) => {
+          if (!resolved) {
+            resolved = true;
+            unsubscribe();
+            reject(err);
+          }
+        });
+      } catch (err) {
+        if (!resolved) {
+          resolved = true;
+          unsubscribe();
+          reject(err);
+        }
+      }
+    });
   }
 
   /**
@@ -406,7 +484,7 @@ export class Wallet {
     if (!this.address) throw new Error('无法获取当前钱包地址');
 
     try {
-      console.log(this.tonConnectUI);
+
       const { address: jettonWalletAddress, decimals } = await this.calculateJettonWalletAddress(jettonMasterAddress, this.address);
 
       let forwardPayloadCell;
@@ -510,6 +588,24 @@ export class Wallet {
       console.error('获取Jetton钱包地址失败:', error);
       throw error;
     }
+  }
+
+  /**
+   * @deprecated 请使用 onStatusChange(handler) 替代。该方法未来版本将被移除。
+   * 添加自定义状态变化监听器（不推荐新项目使用）
+   */
+  addStatusChangeListener(handler: (status: WalletStatus, account?: WalletAccount | null) => void): void {
+    console.warn('[DEPRECATED] addStatusChangeListener 已废弃，请使用 onStatusChange(handler) 替代。');
+    this.statusChangeHandlers.add(handler);
+  }
+
+  /**
+   * @deprecated 请使用 onStatusChange(handler) 返回的解绑函数替代。该方法未来版本将被移除。
+   * 移除自定义状态变化监听器（不推荐新项目使用）
+   */
+  removeStatusChangeListener(handler: (status: WalletStatus, account?: WalletAccount | null) => void): void {
+    console.warn('[DEPRECATED] removeStatusChangeListener 已废弃，请使用 onStatusChange(handler) 返回的解绑函数。');
+    this.statusChangeHandlers.delete(handler);
   }
 }
 
