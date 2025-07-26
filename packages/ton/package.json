@@ -1,36 +1,36 @@
 {
-  "name": "@portex/wallet-ton",
-  "version": "1.0.0",
-  "description": "TON Wallet SDK for Portex",
-  "type": "module",
-  "main": "dist/index.umd.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.mts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.umd.js",
-      "types": "./dist/index.d.mts"
+    "name": "@portex/wallet-ton",
+    "version": "1.0.0",
+    "description": "TON Wallet SDK for Portex",
+    "type": "module",
+    "main": "dist/index.umd.js",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.mts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.umd.js",
+            "types": "./dist/index.d.mts"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsdown",
+        "dev": "tsdown -w",
+        "type-check": "tsc --noEmit",
+        "clean": "rimraf dist"
+    },
+    "keywords": [
+        "ton",
+        "tonconnect"
+    ],
+    "devDependencies": {
+        "@ton/core": "^0.53.0",
+        "@tonconnect/ui": "^2.1.0",
+        "buffer": "^6.0.3",
+        "tonweb": "^0.0.66",
+        "tsdown": "^0.12.9"
     }
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "tsdown && mkdir -p ../../dist/ton && cp -r dist/* ../../dist/ton/",
-    "dev": "tsdown -w",
-    "type-check": "tsc --noEmit",
-    "clean": "rimraf dist"
-  },
-  "keywords": [
-    "ton",
-    "tonconnect"
-  ],
-  "devDependencies": {
-    "@ton/core": "^0.53.0",
-    "@tonconnect/ui": "^2.1.0",
-    "buffer": "^6.0.3",
-    "tonweb": "^0.0.66",
-    "tsdown": "^0.12.9"
-  }
 }

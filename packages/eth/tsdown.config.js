@@ -4,7 +4,7 @@ export default defineConfig({
   outputOptions: { name: 'PortexETH' },
   entry: ['./src/index.ts'],
   format: ['esm', 'umd', 'iife'],
-  platform: "browser",
+  platform: 'browser',
   fixedExtension: true,
-  minify: true, // Whether to minify the output
+  minify: true // Whether to minify the output
 });

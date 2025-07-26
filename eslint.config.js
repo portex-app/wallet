@@ -1,9 +1,9 @@
-import pluginJs from '@eslint/js'; // ESLint 官方 JS 规则插件
-import globals from 'globals'; // 预定义全局变量
-import tseslint from 'typescript-eslint'; // TypeScript 规则插件
+import pluginJs from '@eslint/js'; // Official ESLint JS rules plugin
+import globals from 'globals'; // Predefined global variables
+import tseslint from 'typescript-eslint'; // TypeScript rules plugin
 // import simpleImportSort from 'eslint-plugin-simple-import-sort';
 
-// TypeScript 相关的 ESLint 通用配置（plugins 和 rules），供多目录共用
+// Shared ESLint configuration for TypeScript (plugins and rules) used across multiple directories
 const tsEslintShared = {
   plugins: {
     '@typescript-eslint': tseslint.plugin
@@ -22,7 +22,7 @@ const tsEslintShared = {
     '@typescript-eslint/no-non-null-assertion': 'warn',
     '@typescript-eslint/no-empty-interface': 'warn',
     '@typescript-eslint/ban-ts-comment': 'warn',
-    'no-console': 'off', // SDK中允许console输出
+    'no-console': 'off', // Allow console output in SDK
     'no-debugger': 'warn',
     'no-duplicate-imports': 'error',
     'no-unused-expressions': 'error',
@@ -33,7 +33,7 @@ const tsEslintShared = {
   }
 };
 
-// 配置文件宽松规则
+// Relaxed rules for configuration files
 const configFileRules = {
   '@typescript-eslint/no-explicit-any': 'off',
   '@typescript-eslint/no-unused-vars': 'off',
@@ -48,21 +48,21 @@ const configFileRules = {
 
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
-  // 📌 1. 指定要匹配的文件类型，并忽略特定文件
+  //  1. Specify matched file types and ignore certain files
   {
     files: ['**/*.{js,mjs,cjs,ts,tsx}'],
     ignores: [
-      'dist', // 根目录 dist 文件夹
-      'dist/**', // 根目录 dist 文件夹下的所有内容
-      'node_modules', // 根目录 node_modules
-      'packages/*/dist', // 子包 dist 文件夹
-      'packages/*/node_modules', // 子包 node_modules
-      '**/dist/**', // 任意位置的 dist 文件夹
-      '**/*.d.ts' // 所有类型定义文件
+      'dist', // dist folder in root directory
+      'dist/**', // all contents under dist folder in root
+      'node_modules', // root node_modules
+      'packages/*/dist', // dist folders in subpackages
+      'packages/*/node_modules', // node_modules in subpackages
+      '**/dist/**', // dist folders anywhere
+      '**/*.d.ts' // all type definition files
     ]
   },
 
-  // 📌 2. 设置全局语言选项
+  // 2. Set global language options
   {
     languageOptions: {
       ecmaVersion: 'latest',
@@ -74,12 +74,12 @@ const config = [
     }
   },
 
-  // 📌 3. 加载 ESLint 和 TypeScript 官方推荐规则
+  // 3. Load official ESLint and TypeScript recommended rules
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
 
-  // 📌 4. SDK 源代码 TypeScript 配置 (packages/*/src/**)
-  // ⚠️ 说明：ESLint 的 parserOptions.project 必须指定包含实际文件的 tsconfig
+  // 4. TypeScript config for SDK source code (packages/*/src/**)
+  // Note: ESLint parserOptions.project must specify tsconfig that contains real files
   {
     files: ['packages/*/src/**/*.ts', 'packages/*/src/**/*.tsx'],
     languageOptions: {
@@ -91,13 +91,13 @@ const config = [
     ...tsEslintShared
   },
 
-  // 📌 5. 所有配置文件 TypeScript 配置
+  // 5. TypeScript config for all config files
   {
     files: [
-      '*.config.ts', // 根目录 TypeScript 配置文件
-      '**/*.config.ts', // 任意位置的 TypeScript 配置文件
-      '**/rollup*.config.ts', // rollup 相关配置文件
-      '**/turbo.config.ts' // turbo 配置文件
+      '*.config.ts', // TypeScript config files in root directory
+      '**/*.config.ts', // TypeScript config files anywhere
+      '**/rollup*.config.ts', // rollup related config files
+      '**/turbo.config.ts' // turbo config files
     ],
     languageOptions: {
       parser: tseslint.parser,
@@ -114,24 +114,24 @@ const config = [
     }
   },
 
-  // 📌 6. 所有配置文件 JavaScript 配置
+  // 6. JavaScript config for all config files
   {
     files: [
-      '*.config.{js,mjs,cjs}', // 根目录 JavaScript 配置文件
-      '**/*.config.{js,mjs,cjs}', // 任意位置的 JavaScript 配置文件
-      '**/rollup*.config.{js,mjs,cjs}', // rollup 相关配置文件
-      '**/turbo.config.{js,mjs,cjs}', // turbo 配置文件
-      'eslint.config.{js,mjs,cjs}' // ESLint 配置文件
+      '*.config.{js,mjs,cjs}', // JavaScript config files in root directory
+      '**/*.config.{js,mjs,cjs}', // JavaScript config files anywhere
+      '**/rollup*.config.{js,mjs,cjs}', // rollup related config files
+      '**/turbo.config.{js,mjs,cjs}', // turbo config files
+      'eslint.config.{js,mjs,cjs}' // ESLint config files
     ],
     rules: {
       ...configFileRules,
-      // 所有配置文件额外宽松规则
+      // Additional relaxed rules for all config files
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off'
     }
   },
 
-  // 📌 7. 测试文件特殊规则
+  // 7. Special rules for test files
   {
     files: ['**/*.{test,spec}.{js,ts,tsx}', '**/__tests__/**/*.{js,ts,tsx}', '**/test/**/*.{js,ts}', '**/tests/**/*.{js,ts}'],
     rules: {
@@ -140,10 +140,10 @@ const config = [
     }
   },
 
-  // 📌 8. HTML 测试文件忽略规则
+  // 8. Ignore rules for HTML test files
   {
     files: ['**/test/**/*.html', '**/tests/**/*.html'],
-    rules: {} // HTML文件中的JavaScript不需要严格检查
+    rules: {} // No strict checking for JavaScript inside HTML files
   }
 ];
 

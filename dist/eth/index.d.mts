@@ -2,7 +2,7 @@ import { AbiItem, Contract, EIP1193Provider } from "web3";
 
 //#region src/types.d.ts
 /**
- * 以太坊钱包连接状态
+ * Ethereum wallet connection status
  */
 declare enum EthWalletStatus {
   DISCONNECTED = "disconnected",
@@ -11,41 +11,41 @@ declare enum EthWalletStatus {
   ERROR = "error",
 }
 /**
- * 以太坊钱包账户信息
+ * Ethereum wallet account information
  */
 interface EthWalletAccount {
-  /** 钱包地址 */
+  /** Wallet address */
   address: string;
-  /** 钱包公钥（以太坊中较少使用） */
+  /** Wallet public key (less commonly used in Ethereum) */
   publicKey?: string;
-  /** 以太坊链ID */
+  /** Ethereum chain ID */
   chainId?: string | number;
 }
 /**
- * 以太坊交易参数接口
+ * Ethereum transaction parameters interface
  */
 interface EthTransactionParams {
-  /** 接收地址 */
+  /** Recipient address */
   to: string;
-  /** 发送金额 */
+  /** Amount to send */
   amount: string;
-  /** 交易数据 */
+  /** Transaction data */
   data?: string;
-  /** Gas 限制 */
+  /** Gas limit */
   gasLimit?: string;
-  /** Gas 价格 */
+  /** Gas price */
   gasPrice?: string;
-  /** EIP-1559 最大费用 */
+  /** EIP-1559 max fee per gas */
   maxFeePerGas?: string;
-  /** EIP-1559 最大优先费用 */
+  /** EIP-1559 max priority fee per gas */
   maxPriorityFeePerGas?: string;
   /** Nonce */
   nonce?: number;
-  /** 自定义参数 */
+  /** Custom parameters */
   [key: string]: unknown;
 }
 /**
- * 以太坊钱包状态变化监听器
+ * Ethereum wallet status change listener
  */
 type EthWalletStatusChangeHandler = (status: EthWalletStatus, account?: EthWalletAccount | null) => void;
 //# sourceMappingURL=types.d.ts.map
@@ -57,144 +57,144 @@ declare global {
   }
 }
 declare class Wallet {
-  /** web3 实例 */
+  /** web3 instance */
   private web3;
-  /** 单例实例 */
+  /** singleton instance */
   private static instance;
-  /** 以太坊 provider */
+  /** Ethereum provider */
   private provider?;
-  /** 钱包连接状态 */
+  /** Wallet connection status */
   private _status;
-  /** 当前连接的账户信息 */
+  /** Currently connected account info */
   private _account;
-  /** 状态变化监听器集合 */
+  /** Set of status change listeners */
   private statusChangeHandlers;
-  /** 已初始化的合约实例缓存 */
+  /** Cache for initialized contract instances */
   private contractInstances;
   /**
-   * 构造函数
-   * @param options 以太坊钱包配置选项
+   * Constructor
+   * @param options Ethereum wallet configuration options
    */
   constructor();
   /**
-   * 获取单例实例
+   * Get singleton instance
    */
   static getInstance(): Wallet;
   private handleAccountsChanged;
   private handleDisconnect;
   private handleChainChanged;
   /**
-   * 绑定 provider 的事件
+   * Bind provider events
    */
   private bindProviderEvents;
   /**
-   * 移除 provider 的事件
+   * Unbind provider events
    */
   private unbindProviderEvents;
   /**
-   * 初始化钱包连接状态
+   * Initialize wallet connection status
    */
   private initStatus;
   /**
-   * 处理 provider 状态变化
-   * @param accounts 账户列表
+   * Handle provider status change
+   * @param accounts List of accounts
    */
   private handleProviderStatusChange;
   /**
-   * 更新钱包状态，通知监听器
-   * @param status 钱包状态
-   * @param account 账户信息
+   * Update wallet status and notify listeners
+   * @param status Wallet status
+   * @param account Account information
    */
   private updateStatus;
   /**
-   * 通知所有状态变化监听器
-   * @param status 钱包状态
-   * @param account 账户信息
+   * Notify all status change listeners
+   * @param status Wallet status
+   * @param account Account information
    */
   private notifyStatusChange;
   /**
-   * 获取钱包连接状态
-   * @returns 钱包状态
+   * Get wallet connection status
+   * @returns Wallet status
    */
   get status(): EthWalletStatus;
   /**
-   * 获取当前连接的账户信息
-   * @returns 账户信息
+   * Get currently connected account information
+   * @returns Account information
    */
   get account(): EthWalletAccount | null;
   /**
-   * 获取是否已连接
-   * @returns 是否已连接
+   * Check if wallet is connected
+   * @returns Connection status
    */
   get connected(): boolean;
   /**
-   * 获取 MetaMask 深度链接
-   * @returns MetaMask 深度链接
+   * Get MetaMask deep link
+   * @returns MetaMask deep link URL
    */
   private getMetaMaskDeepLink;
   /**
-   * 添加状态变化监听器
-   * @param handler 状态变化监听器
+   * Add a status change listener
+   * @param handler Status change listener
    */
   addStatusChangeListener(handler: (status: EthWalletStatus, account?: EthWalletAccount | null) => void): void;
   /**
-   * 移除状态变化监听器
-   * @param handler 状态变化监听器
+   * Remove a status change listener
+   * @param handler Status change listener
    */
   removeStatusChangeListener(handler: (status: EthWalletStatus, account?: EthWalletAccount | null) => void): void;
   /**
-   * 连接钱包
-   * @param deeplinkUrl 可选，移动端唤起钱包的deeplink，不传则自动构造
+   * Connect wallet
+   * @param deeplinkUrl Optional deeplink URL for mobile wallet, auto-constructed if not provided
    */
   connect(deeplinkUrl?: string): Promise<void>;
   /**
-   * 断开钱包连接
+   * Disconnect wallet
    */
   disconnect(): Promise<void>;
   /**
-   * 销毁 Wallet 单例实例
+   * Destroy Wallet singleton instance
    */
   static destroy(): void;
   /**
-   * 发送最基础的 ETH 转账交易
-   * @param to 接收地址
-   * @param amount 转账金额
-   * @param unit 单位（可选，默认为 'ether'，也可为 'wei'）
-   * @returns 交易哈希
+   * Send basic ETH transfer transaction
+   * @param to Recipient address
+   * @param amount Amount to transfer
+   * @param unit Unit (optional, default 'ether', can also be 'wei')
+   * @returns Transaction hash
    */
   sendTransaction(to: string, amount: string | number, unit?: 'ether' | 'wei'): Promise<string>;
   /**
-   * 初始化智能合约
-   * @param contractABI 合约 ABI
-   * @param contractAddress 合约地址
-   * @returns 合约实例
+   * Initialize smart contract
+   * @param contractABI Contract ABI
+   * @param contractAddress Contract address
+   * @returns Contract instance
    */
   initContract(contractABI: AbiItem[], contractAddress: string): Contract<AbiItem[]>;
   /**
-   * 获取已初始化的合约实例
-   * @param contractAddress 合约地址
-   * @returns 合约实例，如果未初始化则返回 undefined
+   * Get initialized contract instance
+   * @param contractAddress Contract address
+   * @returns Contract instance, or undefined if not initialized
    */
   getContract(contractAddress: string): Contract<AbiItem[]> | undefined;
   /**
-   * 清除合约实例缓存
-   * @param contractAddress 可选的合约地址，如果不提供则清除所有缓存
+   * Clear contract instance cache
+   * @param contractAddress Optional contract address; clears all cache if not provided
    */
   clearContractCache(contractAddress?: string): void;
   /**
-   * 根据 chainId 获取网络名称
+   * Get network name by chainId
    */
   private getChainName;
   /**
-   * 将 chainId 统一转换为十六进制格式
-   * @param chainId 链 ID（可以是数字或十六进制字符串）
-   * @returns 十六进制格式的 chainId
+   * Format chainId to hex string uniformly
+   * @param chainId Chain ID (number or hex string)
+   * @returns Hex string formatted chainId
    */
   private formatChainId;
   /**
-   * 切换网络
-   * @param chainId 目标网络的 chainId
-   * @param networkInfo 网络信息（仅在需要添加网络时使用）
+   * Switch network
+   * @param chainId Target network chainId
+   * @param networkInfo Network info (only needed if adding network)
    */
   switchNetwork(chainId: string | number, networkInfo?: {
     chainName: string;
@@ -207,20 +207,20 @@ declare class Wallet {
     blockExplorerUrls?: string[];
   }): Promise<void>;
   /**
-   * 获取当前链 ID
+   * Get current chain ID
    */
   get currentChainId(): Promise<string>;
   /**
-   * 获取当前网络信息
+   * Get current network info
    */
   getNetworkInfo(): Promise<{
     chainId: string;
     chainName?: string;
   }>;
   /**
-   * 切换到自定义网络
-   * @param chainId 目标网络的 chainId
-   * @param networkInfo 网络信息
+   * Switch to custom network
+   * @param chainId Target network chainId
+   * @param networkInfo Network information
    */
   switchToCustomNetwork(chainId: string | number, networkInfo: {
     chainName: string;

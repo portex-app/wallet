@@ -3,7 +3,7 @@ import { TonProofItemReply, Wallet as Wallet$1 } from "@tonconnect/ui";
 
 //#region src/types.d.ts
 /**
- * TON 钱包连接状态
+ * TON Wallet connection status
  */
 declare enum TonWalletStatus {
   DISCONNECTED = "disconnected",
@@ -12,185 +12,206 @@ declare enum TonWalletStatus {
   ERROR = "error",
 }
 /**
- * TON 钱包账户信息
+ * TON Wallet account information
  */
 interface TonWalletAccount {
-  /** 钱包地址 */
+  /** Wallet address */
   address: string;
-  /** 钱包公钥 */
+  /** Wallet public key */
   publicKey?: string;
-  /** TON 链ID (-239 主网, -3 测试网) */
+  /** TON chain ID (-239 mainnet, -3 testnet) */
   chainId?: string | number;
 }
 /**
- * TON 交易参数接口
+ * TON transaction parameters interface
  */
 interface TonTransactionParams {
-  /** 接收地址 */
+  /** Recipient address */
   to: string;
-  /** 发送金额 (nanoTON) */
+  /** Amount to send (nanoTON) */
   amount: string;
-  /** 消息负载 */
+  /** Message payload */
   payload?: string;
-  /** 有效期（Unix 时间戳） */
+  /** Valid until (Unix timestamp) */
   validUntil?: number;
-  /** 是否将消息体作为 Cell */
+  /** Whether to use the message body as a Cell */
   stateInit?: string;
-  /** 自定义参数 */
+  /** Custom parameters */
   [key: string]: unknown;
 }
 /**
- * TON Jetton 代币交易参数
+ * TON Jetton token transaction parameters
  */
 interface TonJettonTransactionParams extends TonTransactionParams {
-  /** Jetton 主合约地址 */
+  /** Jetton master contract address */
   jettonMasterAddress: string;
-  /** Jetton 小数位数 */
+  /** Jetton decimals */
   decimals?: number;
-  /** 转发 TON 金额 */
+  /** Forwarded TON amount */
   forwardAmount?: string;
 }
 /**
- * TON 钱包状态变化监听器
+ * TON wallet status change handler
  */
 type TonWalletStatusChangeHandler = (status: TonWalletStatus, account?: TonWalletAccount | null) => void;
 //# sourceMappingURL=types.d.ts.map
 //#endregion
 //#region src/index.d.ts
+/**
+ * Extend WalletAccount with a human-readable address
+ */
+interface WalletAccount extends TonWalletAccount {
+  /** Human-readable format address */
+  addressUserFriendly?: string;
+}
 interface JettonWalletInfo {
   address: string;
   decimals: number;
 }
 declare class Wallet {
-  /** TonConnect UI 实例 */
+  /** TonConnect UI instance */
   private tonConnectUI;
-  /** 单例实例 */
+  /** Singleton instance */
   private static instance;
-  /** 钱包连接状态 */
+  /** Wallet connection status */
   private _status;
-  /** 当前连接的账户信息 */
+  /** Current connected account info */
   private _account;
-  /** 状态变化监听器集合 */
+  /** Set of status change listeners */
   private statusChangeHandlers;
-  /** Jetton钱包地址缓存 */
+  /** Cache for Jetton wallet addresses */
   private jettonWalletCache;
+  /** Unsubscribe function for TonConnect status changes */
+  private _tonConnectStatusUnsubscribe?;
   /**
-   * 构造函数
-   * @param options TON 钱包配置选项
+   * Constructor
+   * @param options TON wallet configuration options
    */
   private constructor();
   /**
-   * 获取 Wallet 单例实例
+   * Get the singleton Wallet instance
    * @param manifestUrl TON Connect manifest URL
-   * @returns Wallet 实例
+   * @returns Wallet instance
    */
   static getInstance(manifestUrl: string): Wallet;
   /**
-   * 检测是否为 iOS 设备
-   * @returns 是否为 iOS 设备
+   * Detect if the device is iOS
+   * @returns true if iOS device
    */
   private isIOSDevice;
   /**
-   * 处理 TonConnect 状态变化
-   * @param wallet 钱包状态
+   * Handle TonConnect status change event
+   * @param wallet Wallet status info
    */
   private handleTonConnectStatusChange;
   /**
-   * 销毁当前实例（兼容旧API）
-   * @deprecated 请直接调用实例的 destroy() 方法
+   * Destroy the current instance (legacy API)
+   * @deprecated Please call the instance's destroy() method directly
    */
   static destroy(): void;
-  /** 获取钱包连接状态 */
+  /** Get wallet connection status */
   get status(): TonWalletStatus;
-  /** 获取当前连接的账户信息 */
-  get account(): TonWalletAccount | null;
-  /** 获取是否已连接 */
+  /** Get current connected account info */
+  get account(): WalletAccount | null;
+  /** Check if wallet is connected */
   get connected(): boolean;
   /**
-   * 获取原始 TonConnect 钱包实例
-   * @returns 当前连接的钱包实例，如果未连接则返回 undefined
+   * Get raw TonConnect wallet instance
+   * @returns Current connected wallet instance or undefined if disconnected
    */
   get wallet(): Wallet$1 | (Wallet$1 & _tonconnect_ui0.WalletInfoWithOpenMethod) | null;
   /**
-   * 获取当前连接的 TonConnect 账户信息
-   * @returns 当前连接的账户信息，如果未连接则返回 undefined
+   * Get current connected TonConnect account info
+   * @returns Current connected account info or undefined if disconnected
    */
   get tonAccount(): _tonconnect_ui0.Account | null;
   /**
-   * 获取当前连接的钱包地址
-   * @returns 当前连接的钱包地址，如果未连接则返回 undefined
+   * Get current connected wallet address
+   * @returns Wallet address or undefined if disconnected
    */
   get address(): string | undefined;
   /**
-   * 更新钱包状态
-   * @param status 新状态
-   * @param account 账户信息
+   * Get current wallet address in human-readable format (non-bounceable, consistent with wallet UI)
+   * @returns Human-readable address (e.g. UQ... / KQ...)
+   */
+  get addressUserFriendly(): string | undefined;
+  /**
+   * Update wallet status
+   * @param status New status
+   * @param account Account info
    */
   private updateStatus;
   /**
-   * 通知所有监听器状态变化
-   * @param status 新状态
-   * @param account 账户信息
+   * Notify all listeners of status change
+   * @param status New status
+   * @param account Account info
    */
   private notifyStatusChange;
   /**
-   * 获取 TON Proof
-   * @returns TON Proof 数据，如果未获取到则返回 null
+   * Get TON Proof
+   * @returns TON Proof data or null if not available
    */
   getTonProof(): TonProofItemReply | null;
   /**
-   * 添加状态变化监听器
-   * @param handler 监听器函数
+   * Listen for TonConnect wallet connection status changes
+   * @param handler Listener function with WalletStatus and WalletAccount parameters
+   * @returns Unsubscribe function
    */
-  addStatusChangeListener(handler: (status: TonWalletStatus, account?: TonWalletAccount | null) => void): void;
+  onStatusChange(handler: (status: TonWalletStatus, account?: WalletAccount | null) => void): () => void;
   /**
-   * 移除状态变化监听器
-   * @param handler 监听器函数
-   */
-  removeStatusChangeListener(handler: (status: TonWalletStatus, account?: TonWalletAccount | null) => void): void;
-  /**
-   * 销毁钱包实例
+   * Destroy wallet instance
    */
   destroy(): void;
   /**
-   * 连接钱包
+   * Connect to wallet
+   * @returns Whether the connection was successful
    */
-  connect(): Promise<void>;
+  connect(): Promise<boolean>;
   /**
-   * 断开钱包连接
+   * Disconnect wallet
    */
   disconnect(): Promise<void>;
   /**
-   * 发送 TON 交易
-   * @param to 接收地址
-   * @param amount 发送金额（TON）
-   * @param message 可选的消息内容
-   * @returns 交易哈希
+   * Send TON transaction
+   * @param to Recipient address
+   * @param amount Amount to send (TON)
+   * @param message Optional message content
+   * @returns Transaction hash
    */
   sendTransaction(to: string, amount: number, message?: string): Promise<string>;
   /**
-   * 发送 JETTON 代币交易
-   * @param jettonMasterAddress JETTON主合约地址
-   * @param to 接收地址
-   * @param amount 发送金额（人类可读数量，自动转最小单位）
-   * @param message 可选的消息内容
-   * @param gasAmount 可选的gas费（TON），默认0.1
-   * @returns 交易哈希
+   * Send JETTON token transaction
+   * @param jettonMasterAddress JETTON master contract address
+   * @param to Recipient address
+   * @param amount Amount to send (human-readable, auto converted to smallest unit)
+   * @param message Optional message content
+   * @param gasAmount Optional gas fee (TON), default 0.1
+   * @returns Transaction hash
    */
   sendJettonTransaction(jettonMasterAddress: string, to: string, amount: number, message?: string): Promise<string>;
   /**
-   * 获取当前网络类型
+   * Get current network type
    * @returns 'mainnet' | 'testnet'
    */
   getNetwork(): 'mainnet' | 'testnet';
   /**
-   * 获取Jetton钱包地址
-   * @param jettonMasterAddress Jetton主合约地址
-   * @param ownerAddress 用户钱包地址
-   * @returns Jetton钱包地址
+   * Get the Jetton wallet address
+   * @param jettonMasterAddress Jetton master contract address
+   * @param ownerAddress User wallet address
+   * @returns Jetton wallet address info
    */
   calculateJettonWalletAddress(jettonMasterAddress: string, ownerAddress: string): Promise<JettonWalletInfo>;
+  /**
+   * @deprecated Please use onStatusChange(handler) instead. This method will be removed in future versions.
+   * Add a custom status change listener (not recommended for new projects)
+   */
+  addStatusChangeListener(handler: (status: TonWalletStatus, account?: WalletAccount | null) => void): void;
+  /**
+   * @deprecated Please use the unsubscribe function returned by onStatusChange(handler) instead. This method will be removed in future versions.
+   * Remove a custom status change listener (not recommended for new projects)
+   */
+  removeStatusChangeListener(handler: (status: TonWalletStatus, account?: WalletAccount | null) => void): void;
 }
 //#endregion
-export { TonJettonTransactionParams, TonTransactionParams, TonWalletAccount, TonWalletStatus, TonWalletStatusChangeHandler, Wallet };
+export { TonJettonTransactionParams, TonTransactionParams, TonWalletAccount, TonWalletStatus, TonWalletStatusChangeHandler, Wallet, WalletAccount };
 //# sourceMappingURL=index.d.mts.map

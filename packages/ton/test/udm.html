@@ -256,7 +256,7 @@
           throw new Error('manifest配置文件不能为空');
         }
         wallet = PortexTON.Wallet.getInstance(manifestUrl);
-        wallet.onStatusChange(function(status, account) {
+        wallet.onStatusChange(function (status, account) {
           if (status === 'connected' && account) {
             updateWalletStatus('connected', account);
             log('已连接，原始地址: ' + account.address);
@@ -281,7 +281,7 @@
         statusEl.className = `status ${status}`;
 
         if (account) {
-          infoEl.textContent =  `钱包地址: ${account.addressUserFriendly}`;
+          infoEl.textContent = `钱包地址: ${account.addressUserFriendly}`;
           connectBtn.disabled = true;
           disconnectBtn.disabled = false;
           sendBtn.disabled = false;

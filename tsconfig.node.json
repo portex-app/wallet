@@ -1,49 +1,45 @@
 {
-  // 📌 Node.js 环境 TypeScript 配置文件
-  // 用于构建工具和配置文件（如 rollup.config.js、eslint.config.js）
-  "compilerOptions": {
-    // 🔧 构建信息文件路径
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-
-    // 🎯 编译目标版本
-    "target": "ES2022", // 编译为 ES2022 标准，支持最新的 Node.js 特性
-
-    // 📚 包含的库文件
-    "lib": ["ES2023"], // 包含 ES2023 标准库，支持最新的 JavaScript 特性
-
-    // 📦 模块系统
-    "module": "ESNext", // 使用最新的 ES 模块语法
-
-    // ⚡ 跳过库文件类型检查，提高编译速度
-    "skipLibCheck": true,
-
-    /* 📦 Bundler 模式配置 */
-    "moduleResolution": "bundler", // 使用打包工具的模块解析策略
-    "allowImportingTsExtensions": true, // 允许导入 .ts/.tsx 扩展名
-    "verbatimModuleSyntax": true, // 保持模块语法的原始形式
-    "moduleDetection": "force", // 强制检测模块
-    "noEmit": true, // 不输出编译文件，由打包工具处理
-    "resolveJsonModule": true, // 允许导入 JSON 模块
-
-    /* 🌐 互操作性配置 */
-    "allowSyntheticDefaultImports": true, // 允许合成默认导入
-    "esModuleInterop": true, // 启用 ES 模块互操作
-    "forceConsistentCasingInFileNames": true, // 强制文件名大小写一致
-    "allowJs": true, // 允许编译 JavaScript 文件
-
-    /* 🔍 代码检查配置（相对宽松，适合配置文件） */
-    "strict": false, // 配置文件使用相对宽松的检查
-    "noUnusedLocals": false, // 配置文件允许未使用的变量
-    "noUnusedParameters": false, // 配置文件允许未使用的参数
-    "noFallthroughCasesInSwitch": true, // 检查 switch 语句的 fallthrough
-    "noUncheckedSideEffectImports": false, // 配置文件允许副作用导入
-
-    /* 🔧 项目引用配置 */
-    "composite": true, // 启用项目引用
-    "types": ["node"] // 包含 Node.js 类型定义
-  },
-  "include": [
-    "*.config.*", // 根目录的所有配置文件
-    "packages/*/*.config.*" // 子包的配置文件
-  ]
+    //  Node.js 环境 TypeScript 配置文件
+    // 用于构建工具和配置文件（如 rollup.config.js、eslint.config.js）
+    "compilerOptions": {
+        //  构建信息文件路径
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+        //  编译目标版本
+        "target": "ES2022", // 编译为 ES2022 标准，支持最新的 Node.js 特性
+        //  包含的库文件
+        "lib": [
+            "ES2023"
+        ], // 包含 ES2023 标准库，支持最新的 JavaScript 特性
+        //  模块系统
+        "module": "ESNext", // 使用最新的 ES 模块语法
+        //  跳过库文件类型检查，提高编译速度
+        "skipLibCheck": true,
+        /*  Bundler 模式配置 */
+        "moduleResolution": "bundler", // 使用打包工具的模块解析策略
+        "allowImportingTsExtensions": true, // 允许导入 .ts/.tsx 扩展名
+        "verbatimModuleSyntax": true, // 保持模块语法的原始形式
+        "moduleDetection": "force", // 强制检测模块
+        "noEmit": true, // 不输出编译文件，由打包工具处理
+        "resolveJsonModule": true, // 允许导入 JSON 模块
+        /*  互操作性配置 */
+        "allowSyntheticDefaultImports": true, // 允许合成默认导入
+        "esModuleInterop": true, // 启用 ES 模块互操作
+        "forceConsistentCasingInFileNames": true, // 强制文件名大小写一致
+        "allowJs": true, // 允许编译 JavaScript 文件
+        /*  代码检查配置（相对宽松，适合配置文件） */
+        "strict": false, // 配置文件使用相对宽松的检查
+        "noUnusedLocals": false, // 配置文件允许未使用的变量
+        "noUnusedParameters": false, // 配置文件允许未使用的参数
+        "noFallthroughCasesInSwitch": true, // 检查 switch 语句的 fallthrough
+        "noUncheckedSideEffectImports": false, // 配置文件允许副作用导入
+        /*  项目引用配置 */
+        "composite": true, // 启用项目引用
+        "types": [
+            "node"
+        ] // 包含 Node.js 类型定义
+    },
+    "include": [
+        "*.config.*", // 根目录的所有配置文件
+        "packages/*/*.config.*" // 子包的配置文件
+    ]
 }

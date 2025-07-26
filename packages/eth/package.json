@@ -1,33 +1,33 @@
 {
-  "name": "@portex/wallet-eth",
-  "version": "1.0.0",
-  "description": "Ethereum Wallet SDK for Portex",
-  "type": "module",
-  "main": "dist/index.umd.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.mts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.umd.js",
-      "types": "./dist/index.d.mts"
+    "name": "@portex/wallet-eth",
+    "version": "1.0.0",
+    "description": "Ethereum Wallet SDK for Portex",
+    "type": "module",
+    "main": "dist/index.umd.js",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.mts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.umd.js",
+            "types": "./dist/index.d.mts"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsdown",
+        "dev": "tsdown -w",
+        "type-check": "tsc --noEmit",
+        "clean": "rimraf dist"
+    },
+    "keywords": [
+        "ethereum",
+        "web3"
+    ],
+    "devDependencies": {
+        "web3": "^4.16.0",
+        "tsdown": "^0.12.9"
     }
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "tsdown && mkdir -p ../../dist/eth && cp -r dist/* ../../dist/eth/",
-    "dev": "tsdown -w",
-    "type-check": "tsc --noEmit",
-    "clean": "rimraf dist"
-  },
-  "keywords": [
-    "ethereum",
-    "web3"
-  ],
-  "devDependencies": {
-    "web3": "^4.16.0",
-    "tsdown": "^0.12.9"
-  }
 }
