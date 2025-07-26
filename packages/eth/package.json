@@ -5,20 +5,20 @@
   "type": "module",
   "main": "dist/index.umd.js",
   "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "types": "dist/index.d.mts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.umd.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.mts"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c && mkdir -p ../../dist/eth && cp -r dist/* ../../dist/eth/",
-    "dev": "rollup -c -w",
+    "build": "tsdown && mkdir -p ../../dist/eth && cp -r dist/* ../../dist/eth/",
+    "dev": "tsdown -w",
     "type-check": "tsc --noEmit",
     "clean": "rimraf dist"
   },
@@ -26,7 +26,8 @@
     "ethereum",
     "web3"
   ],
-  "peerDependencies": {
-    "web3": "^4.16.0"
+  "devDependencies": {
+    "web3": "^4.16.0",
+    "tsdown": "^0.12.9"
   }
 }
