@@ -567,7 +567,7 @@ export class Wallet {
             const data = await response.json();
 
             if (!data || !data.wallet_address) {
-                throw new Error('Failed to get Jetton wallet address');
+                throw new Error('Transaction failed to send: Insufficient balance!');
             }
 
             const result = {
