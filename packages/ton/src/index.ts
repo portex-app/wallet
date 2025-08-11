@@ -346,9 +346,7 @@ export class Wallet {
      * Destroy wallet instance
      */
     destroy(): void {
-        if (this.tonConnectUI.connected) {
-            this.tonConnectUI.disconnect();
-        }
+
         this.tonConnectUI.closeModal();
 
         // Unsubscribe onStatusChange
@@ -462,7 +460,7 @@ export class Wallet {
             return result.boc;
         } catch (error) {
             console.error('Failed to send transaction:', error);
-            throw error;
+            throw new Error('Failed to send TON transaction. Please check your connection and try again.');
         }
     }
 
@@ -522,8 +520,8 @@ export class Wallet {
             console.log('Transaction sent:', result);
             return result.boc;
         } catch (error) {
-            console.error('[JETTON][ERROR] Failed to send JETTON transaction:', error);
-            throw error;
+            console.error('Failed to send JETTON transaction:', error);
+            throw new Error('Failed to send Jetton transaction. Please ensure you have enough balance and try again.');
         }
     }
 
